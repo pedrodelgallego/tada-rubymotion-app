@@ -1,23 +1,13 @@
 # -*- coding: utf-8 -*-
 class TaskCell < UITableViewCell
   CellID = 'CellIdentifier'
-  @gradient
-  @originalCenter
-  @deleteOnDragRelease
 
   class << self
     def cellForTask(item, inTableView:tableView)
-      cell = tableView.dequeueReusableCellWithIdentifier(TaskCell::CellID) ||
-        TaskCell.alloc
+      cell = tableView.dequeueReusableCellWithIdentifier(TaskCell::CellID) || TaskCell.alloc
 
       # Events
-      # recognizer = UIPanGestureRecognizer.alloc.initWithTarget(self, action:'handlePan')
-      # recognizer.delegate = self;
-      # cell.addGestureRecognizer(recognizer)
-
-      cell.when_panned do |recognizer|
-        cell.handle_swipe(recognizer)
-      end
+      cell.addGestures
 
       # Styling the cell
       cell.addGradient(UITableViewCellStyleDefault, reuseIdentifier:CellID)
@@ -26,6 +16,13 @@ class TaskCell < UITableViewCell
 
       cell
     end
+  end
+
+  def addGestures
+    # panGesture for managing panning on a cell
+    @panGesture = UIPanGestureRecognizer.alloc.initWithTarget(self, action:"handle_pan")
+    @panGesture.delegate = self
+    self.addGestureRecognizer @panGesture
   end
 
   #-----------------------------------------------
@@ -58,29 +55,35 @@ class TaskCell < UITableViewCell
   #-----------------------------------------------
   #  Adding gestures
   #-----------------------------------------------
-  # def gestureRecognizerShouldBegin(gestureRecognizer)
-  #   translation = gestureRecognizer.translationInView(self.superview)
-  #   puts "yaaay"
+  def gestureRecognizerShouldBegin(recognizer)
+    if recognizer.class != UIPanGestureRecognizer then
+      return false
+    end
+    translation = recognizer.translationInView(self.superview)
 
-  #   # Check for horizontal gesture
-  #   if (fabsf(translation.x) > fabsf(translation.y)) then
-  #     return true
-  #   end
-  #   false
-  # end
+    if (translation.x.abs > translation.y.abs) then
+      return true
+    end
+    false
+  end
 
-  def handle_swipe(recognizer)
-    if (recognizer.state == UIGestureRecognizerStateBegan) then
+  def handle_pan
+    if (@panGesture.state == UIGestureRecognizerStateBegan) then
       @originalCenter = self.center;
     end
 
-    if (recognizer.state == UIGestureRecognizerStateChanged) then
-      # translate the center
-      translation = recognizer.translationInView(self)
+    if (@panGesture.state == UIGestureRecognizerStateChanged) then
+      translation = @panGesture.translationInView(self)
       self.center = CGPointMake(@originalCenter.x + translation.x, @originalCenter.y)
     end
 
-    if (recognizer.state == UIGestureRecognizerStateEnded) then
+    if (@panGesture.state == UIGestureRecognizerStateEnded) then
+      # the frame this cell would have had before being dragged
+      originalFrame = CGRectMake(0, self.frame.origin.y, self.bounds.size.width, self.bounds.size.height);
+      if (!@deleteOnDragRelease) then
+        #if the item is not being deleted, snap back to the original location
+        UIView.animateWithDuration(0.2, animations: lambda {self.frame = originalFrame})
+      end
     end
   end
 end
