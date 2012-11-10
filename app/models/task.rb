@@ -8,6 +8,7 @@ class Task
     def create(text)
       task = self.alloc
       task.text = text
+      task.completed = false
       @@tasks.push task
       task
     end
