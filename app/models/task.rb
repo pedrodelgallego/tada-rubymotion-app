@@ -26,4 +26,7 @@ class Task
     end
   end
 
+  def destroy
+    @@tasks = @@tasks.select{ |task| task.text != self.text }
+  end
 end

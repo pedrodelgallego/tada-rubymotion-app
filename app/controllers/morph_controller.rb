@@ -60,6 +60,16 @@ class MorphController < UIViewController
 
   def tableView(tableView, willDisplayCell:cell, forRowAtIndexPath:indexPath)
     cell.backgroundColor = colorForIndex(indexPath.row)
+    cell.delegate = self
+  end
+
+  def taskDeleted(task)
+    index = Task.all.find_index { |t| t.text == task.text}
+    index_path = NSIndexPath.indexPathForRow(index, inSection:0)
+    @table.beginUpdates
+    task.destroy
+    @table.deleteRowsAtIndexPaths([index_path], withRowAnimation:UITableViewRowAnimationFade)
+    @table.endUpdates
   end
 
 end
