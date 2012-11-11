@@ -1,9 +1,34 @@
+# -*- coding: undecided -*-
 class MorphController < UIViewController
-  def viewDidLoad
+  def viewDidAppear(animated)
     super
+    if PFUser.currentUser
+      showTaskTable
+    else
+      login = PFLogInViewController.alloc.init
+      login.delegate = self
+      login.signUpController.delegate = self
+      self.presentModalViewController(login, animated:true)
+    end
+  end
 
-    self.title = "Alphabet"
+  def logInViewController(logInController, didLogInUser:user)
+    self.dismissModalViewControllerAnimated(true)
+  end
 
+  def logInViewControllerDidCancelLogIn(logInController)
+    self.dismissModalViewControllerAnimated(true)
+  end
+
+  def signUpViewController(signUpController, didSignUpUser:user)
+    self.dismissModalViewControllerAnimated(true)
+  end
+
+  def signUpViewControllerDidCancelLogIn(signUpController, didLogInUser:user)
+    self.dismissModalViewControllerAnimated(true)
+  end
+
+  def showTaskTable
     @table = UITableView.alloc.initWithFrame(self.view.bounds)
     @table.dataSource = self
     @table.delegate   = self
@@ -11,7 +36,24 @@ class MorphController < UIViewController
     @table.separatorStyle = UITableViewCellSeparatorStyleNone
     @table.backgroundColor = UIColor.blackColor
 
-    self.view.addSubview @table
+    view.addSubview @table
+  end
+
+  def logoutTapped
+    PFUser.logOut
+    appDelegate = UIApplication.sharedApplication.delegate
+    appDelegate.presentMainViewController
+  end
+
+  def actionTapped
+    if @timer
+      @timer.invalidate
+      @timer = nil
+    else
+      @duration = 0
+      @timer = NSTimer.scheduledTimerWithTimeInterval(0.1, target:self, selector:'timerFired', userInfo:nil, repeats:true)
+    end
+    @action.selected = !@action.selected?
   end
 
   def viewDidUnload
@@ -49,5 +91,4 @@ class MorphController < UIViewController
     @table.deleteRowsAtIndexPaths([index_path], withRowAnimation:UITableViewRowAnimationFade)
     @table.endUpdates
   end
-
 end

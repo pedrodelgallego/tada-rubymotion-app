@@ -1,14 +1,20 @@
-# -*- coding: utf-8 -*-
 $:.unshift("/Library/RubyMotion/lib")
 require 'motion/project'
-require 'bubble-wrap/ui'
+require 'bubble-wrap/http'
+require 'motion-cocoapods'
 
 Motion::Project::App.setup do |app|
-  # Use `rake config' to see complete project settings.
   app.name = 'morph'
 
-  # app.device_family = :ipad
-  # app.interface_orientations = [:landscape_left, :landscape_right]
+  # app.sdk_version = "5.1"
 
-  app.frameworks << "QuartzCore"
+  app.libs += ['/usr/lib/libz.dylib', '/usr/lib/libsqlite3.dylib', '/usr/lib/libz.1.1.3.dylib']
+
+  app.frameworks += %w( QuartzCore )
+
+  # Parse Dependencies
+  app.frameworks += %w(AudioToolbox AdSupport CFNetwork CoreGraphics CoreLocation
+    MobileCoreServices Security Social StoreKit SystemConfiguration)
+
+  app.vendor_project('vendor/Parse.framework', :static, :products => ['Parse'], :headers_dir => 'Headers')
 end

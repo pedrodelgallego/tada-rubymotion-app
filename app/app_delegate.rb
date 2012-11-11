@@ -1,5 +1,9 @@
 class AppDelegate
   def application(application, didFinishLaunchingWithOptions:launchOptions)
+
+    # Parse.setApplicationId "XXXX",
+    #   clientKey: "YYYY"
+
     Task.loadTasks
 
     @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
