@@ -111,7 +111,11 @@ class TaskCell < UITableViewCell
       if !@deleteOnDragRelease then
         UIView.animateWithDuration(0.2, animations: lambda {self.frame = originalFrame})
       elsif @deleteOnDragRelease then
-        delegate.taskDeleted @task
+        if @task == true then
+          UIView.animateWithDuration(0.2, animations: lambda {self.frame = originalFrame})
+        else
+          delegate.taskDeleted @task
+        end
       end
 
       if !@completedOnDragRelease then
