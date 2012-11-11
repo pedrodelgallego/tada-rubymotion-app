@@ -1,0 +1,17 @@
+[
+  {"text": "Feed the cat", "completed": false},
+  {"text": "Buy eggs", "completed": false},
+  {"text": "Pack bags for WWDC", "completed": false},
+  {"text": "Rule the web", "completed": false},
+  {"text": "Buy a new iPhone", "completed": false},
+  {"text": "Find missing socks", "completed": false},
+  {"text": "Write a new tutorial", "completed": false},
+  {"text": "Master Objective-C", "completed": false},
+  {"text": "Remember your wedding anniversary!", "completed": false},
+  {"text": "Drink less beer", "completed": false},
+  {"text": "Learn to draw", "completed": false},
+  {"text": "Take the car to the garage", "completed": false},
+  {"text": "Sell things on eBay", "completed": false},
+  {"text": "Learn to juggle", "completed": false},
+  {"text": "Give up", "completed": false}
+]

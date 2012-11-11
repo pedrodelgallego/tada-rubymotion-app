@@ -4,8 +4,6 @@ class MorphController < UIViewController
 
     self.title = "Alphabet"
 
-    self.populate_table
-
     @table = UITableView.alloc.initWithFrame(self.view.bounds)
     @table.dataSource = self
     @table.delegate   = self
@@ -14,26 +12,6 @@ class MorphController < UIViewController
     @table.backgroundColor = UIColor.blackColor
 
     self.view.addSubview @table
-  end
-
-  def populate_table
-    Task.create("Feed the cat")
-    Task.create("Buy eggs")
-    Task.create("Pack bags for WWDC")
-    Task.create("Rule the web")
-    Task.create("Buy a new iPhone")
-    Task.create("Find missing socks")
-    Task.create("Write a new tutorial")
-    Task.create("Master Objective-C")
-    Task.create("Remember your wedding anniversary!")
-    Task.create("Drink less beer")
-    Task.create("Learn to draw")
-    Task.create("Take the car to the garage")
-    Task.create("Sell things on eBay")
-    Task.create("Learn to juggle")
-    Task.create("Give up")
-
-    self
   end
 
   def viewDidUnload
