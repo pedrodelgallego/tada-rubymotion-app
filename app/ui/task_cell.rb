@@ -1,17 +1,22 @@
 class TaskCell < UITableViewCell
-  CellID = 'CellIdentifier'
+  CellID            = 'CellIdentifier'
   LABEL_LEFT_MARGIN = 15.0
+  UI_CUES_MARGIN    = 10.0
+  UI_CUES_WIDTH     = 50.0
 
   attr_accessor :delegate
   attr_accessor :task
-
   attr_accessor :label
   attr_accessor :completeLayer
+  attr_accessor :tickLabel
+  attr_accessor :crossLabel
 
   class << self
     def cellForTask(task, inTableView:tableView)
       cell = tableView.dequeueReusableCellWithIdentifier(TaskCell::CellID)
 
+      # this should be actually in an override initWithStyle method in
+      # the instance level, but whatever
       unless cell
         cell = TaskCell.alloc.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:CellID)
 
@@ -22,7 +27,7 @@ class TaskCell < UITableViewCell
         cell.styleCell
         cell.addGradient
         cell.textLabel.backgroundColor = UIColor.clearColor
-
+        cell.addVisualCues
       end
       cell.setTask task
       cell
@@ -37,7 +42,7 @@ class TaskCell < UITableViewCell
   end
 
   #-----------------------------------------------
-  #  Styling
+  #  Styling And Cues
   #-----------------------------------------------
   def styleCell
     self.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -56,6 +61,20 @@ class TaskCell < UITableViewCell
     self.layer.insertSublayer(@completeLayer, atIndex:0)
   end
 
+  def addVisualCues
+    @tickLabel = self.createCueLabel
+    @tickLabel.text = "\u2713"
+    @tickLabel.textAlignment = NSTextAlignmentRight
+    self.addSubview(@tickLabel)
+
+    @crossLabel = self.createCueLabel
+    @crossLabel.text = "\u2717"
+    @crossLabel.textAlignment = NSTextAlignmentLeft
+    self.addSubview(@crossLabel)
+
+    self
+  end
+
   def addGradient
     @gradient = CAGradientLayer.layer
     @gradient.frame = self.bounds
@@ -72,14 +91,28 @@ class TaskCell < UITableViewCell
     self
   end
 
+  def createCueLabel
+    label = UILabel.alloc.initWithFrame(CGRectNull)
+    label.textColor = UIColor.whiteColor
+    label.font = UIFont.boldSystemFontOfSize(32.0)
+    label.backgroundColor = UIColor.clearColor
+    label
+  end
+
   def layoutSubviews
     super
     @gradient.frame = self.bounds;
     @completeLayer.frame = self.bounds;
+
     @label.frame = CGRectMake(LABEL_LEFT_MARGIN, 0,
       self.bounds.size.width - LABEL_LEFT_MARGIN,self.bounds.size.height)
-  end
 
+    @tickLabel.frame = CGRectMake(-UI_CUES_WIDTH - UI_CUES_MARGIN, 0,
+      UI_CUES_WIDTH, self.bounds.size.height);
+
+    @crossLabel.frame = CGRectMake(self.bounds.size.width + UI_CUES_MARGIN, 0,
+      UI_CUES_WIDTH, self.bounds.size.height);
+  end
   #-----------------------------------------------
   #  Adding gestures
   #-----------------------------------------------
@@ -106,6 +139,14 @@ class TaskCell < UITableViewCell
       @deleteOnDragRelease = self.frame.origin.x < -self.frame.size.width / 2;
 
       @completedOnDragRelease = self.frame.origin.x > self.frame.size.width / 2;
+
+
+      cueAlpha = frame.origin.x.abs / (frame.size.width / 2);
+      @tickLabel.alpha = cueAlpha;
+      @crossLabel.alpha = cueAlpha;
+
+      @tickLabel.textColor  = @completedOnDragRelease ? UIColor.greenColor : UIColor.whiteColor;
+      @crossLabel.textColor = @deleteOnDragRelease    ? UIColor.redColor : UIColor.whiteColor;
     end
 
     if (@panGesture.state == UIGestureRecognizerStateEnded) then
