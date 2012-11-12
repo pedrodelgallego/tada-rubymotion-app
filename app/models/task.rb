@@ -26,20 +26,26 @@ class Task
 
     def loadTasks
       @@tasks = []
-      error_ptr = Pointer.new(:object)
 
-      path = NSBundle.mainBundle.pathForResource("tasks", ofType:"json")
+      # if you want to use a json object
+      # error_ptr = Pointer.new(:object)
+      # path = NSBundle.mainBundle.pathForResource("tasks", ofType:"json")
+      # data = NSData.dataWithContentsOfFile(path, options:NSDataReadingUncached, error:error_ptr)
+      # json = NSJSONSerialization.JSONObjectWithData(data, options:NSDataReadingUncached, error:error_ptr)
+      # unless json
+      #   puts error_ptr[0].localizedDescription
+      #   return
+      # end
 
-      data = NSData.dataWithContentsOfFile(path, options:NSDataReadingUncached, error:error_ptr)
+      # if you want to use an async parse call
+      # objects = PFQuery.queryWithClassName("TestObject").
+      #   findObjectsInBackgroundWithBlock lambda{ |objects, errors|
+      #     objects.each { |task| Task.create task.objectForKey("text"), task.objectForKey("completed") }
+      # }
 
-      json = NSJSONSerialization.JSONObjectWithData(data, options:NSDataReadingUncached, error:error_ptr)
-
-      unless json
-        puts error_ptr[0].localizedDescription
-        return
-      end
-
-      json.each { |a, b| Task.create a["text"], a["completed"] }
+      # A sync parse call
+      objects = PFQuery.queryWithClassName("TestObject").findObjects()
+      objects.each { |task| Task.create task.objectForKey("text"), task.objectForKey("completed") }
     end
   end
 
