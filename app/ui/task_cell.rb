@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 class TaskCell < UITableViewCell
   CellID = 'CellIdentifier'
   LABEL_LEFT_MARGIN = 15.0
@@ -11,16 +10,21 @@ class TaskCell < UITableViewCell
 
   class << self
     def cellForTask(task, inTableView:tableView)
-      cell = tableView.dequeueReusableCellWithIdentifier(TaskCell::CellID) ||
-        TaskCell.alloc.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:CellID)
-      # Events
-      cell.addGestures
+      cell = tableView.dequeueReusableCellWithIdentifier(TaskCell::CellID)
 
-      # Styling the cell
-      cell.styleCell
-      cell.addGradient
-      cell.textLabel.backgroundColor = UIColor.clearColor
+      unless cell
+        puts "creating a new cell"
+        cell = TaskCell.alloc.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:CellID)
 
+        # Events
+        cell.addGestures
+
+        # Styling the cell
+        cell.styleCell
+        cell.addGradient
+        cell.textLabel.backgroundColor = UIColor.clearColor
+
+      end
       cell.setTask task
       cell
     end
@@ -74,7 +78,7 @@ class TaskCell < UITableViewCell
     @gradient.frame = self.bounds;
     @completeLayer.frame = self.bounds;
     @label.frame = CGRectMake(LABEL_LEFT_MARGIN, 0,
-                              self.bounds.size.width - LABEL_LEFT_MARGIN,self.bounds.size.height)
+      self.bounds.size.width - LABEL_LEFT_MARGIN,self.bounds.size.height)
   end
 
   #-----------------------------------------------
@@ -111,7 +115,7 @@ class TaskCell < UITableViewCell
       if !@deleteOnDragRelease then
         UIView.animateWithDuration(0.2, animations: lambda {self.frame = originalFrame})
       elsif @deleteOnDragRelease then
-        if @task == true then
+        if @task.completed then
           UIView.animateWithDuration(0.2, animations: lambda {self.frame = originalFrame})
         else
           delegate.taskDeleted @task
@@ -121,7 +125,7 @@ class TaskCell < UITableViewCell
       if !@completedOnDragRelease then
         UIView.animateWithDuration(0.2, animations: lambda {self.frame = originalFrame})
       elsif @completedOnDragRelease then
-        @task = true;
+        @task.completed = true
         @completeLayer.hidden = false;
         @label.strikethrough = true;
       end
@@ -132,9 +136,14 @@ class TaskCell < UITableViewCell
     @task = task;
 
     # we must update all the visual state associated with the model item
-    @label.text = task.text;
-    @label.strikethrough = task.completed;
-    @completeLayer.hidden = !task.completed;
+    @label.text = task.text
+    @label.strikethrough = task.completed
+    @completeLayer.hidden = !task.completed
+  end
+
+  def prepareForReuse
+    @label.text = ""
+    @completeLayer.hidden = true
   end
 
 end
