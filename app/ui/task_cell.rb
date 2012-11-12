@@ -13,7 +13,6 @@ class TaskCell < UITableViewCell
       cell = tableView.dequeueReusableCellWithIdentifier(TaskCell::CellID)
 
       unless cell
-        puts "creating a new cell"
         cell = TaskCell.alloc.initWithStyle(UITableViewCellStyleDefault, reuseIdentifier:CellID)
 
         # Events
@@ -115,11 +114,7 @@ class TaskCell < UITableViewCell
       if !@deleteOnDragRelease then
         UIView.animateWithDuration(0.2, animations: lambda {self.frame = originalFrame})
       elsif @deleteOnDragRelease then
-        if @task.completed then
-          UIView.animateWithDuration(0.2, animations: lambda {self.frame = originalFrame})
-        else
-          delegate.taskDeleted @task
-        end
+        delegate.taskDeleted @task
       end
 
       if !@completedOnDragRelease then
