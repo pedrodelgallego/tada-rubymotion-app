@@ -11,6 +11,8 @@ class TaskCell < UITableViewCell
   attr_accessor :tickLabel
   attr_accessor :crossLabel
 
+  @editingOffset
+
   class << self
     def cellForTask(task, inTableView:tableView)
       cell = tableView.dequeueReusableCellWithIdentifier(TaskCell::CellID)
@@ -27,6 +29,7 @@ class TaskCell < UITableViewCell
         cell.styleCell
         cell.addGradient
         cell.textLabel.backgroundColor = UIColor.clearColor
+
         cell.addVisualCues
       end
       cell.setTask task
@@ -51,6 +54,10 @@ class TaskCell < UITableViewCell
     @label.textColor = UIColor.whiteColor
     @label.font = UIFont.boldSystemFontOfSize(16)
     @label.backgroundColor = UIColor.clearColor
+
+    @label.delegate = self
+    @label.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter
+
     self.addSubview(@label)
 
     # add a layer that renders a green background when an item is complete
@@ -182,4 +189,22 @@ class TaskCell < UITableViewCell
     @completeLayer.hidden = true
   end
 
+  # == UITextFieldDelegate ==
+  def textFieldShouldReturn(textField)
+    textField.resignFirstResponder
+    false
+  end
+
+  def textFieldShouldBeginEditing(textField)
+    !@task.completed
+  end
+
+  def textFieldDidEndEditing(textField)
+    self.delegate.cellDidEndEditing(self)
+    @task.text = textField.text
+  end
+
+  def textFieldDidBeginEditing(textField)
+    self.delegate.cellDidBeginEditing(self)
+  end
 end

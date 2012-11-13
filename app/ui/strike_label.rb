@@ -1,4 +1,4 @@
-class StrikeLabel < UILabel
+class StrikeLabel < UITextField
   attr_accessor :strikethrough
   attr_accessor :strike_layer
   STRIKE_THICKNESS = 2.0

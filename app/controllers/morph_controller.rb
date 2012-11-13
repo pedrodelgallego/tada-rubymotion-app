@@ -36,6 +36,16 @@ class MorphController < UIViewController
     @table.separatorStyle = UITableViewCellSeparatorStyleNone
     @table.backgroundColor = UIColor.blackColor
 
+    label = UILabel.alloc.initWithFrame(CGRectMake(0, 0, 320, 380))
+    label.text = "It was a very long book with many lines..."
+    label.backgroundColor = UIColor.blackColor
+    label.textColor = UIColor.whiteColor
+    label.font = UIFont.systemFontOfSize(13)
+    label.lineBreakMode = UILineBreakModeWordWrap
+    label.textAlignment = UITextAlignmentCenter
+    label.numberOfLines = 0
+    @table.tableFooterView = label
+
     view.addSubview @table
   end
 
@@ -90,5 +100,33 @@ class MorphController < UIViewController
     task.destroy
     @table.deleteRowsAtIndexPaths([index_path], withRowAnimation:UITableViewRowAnimationFade)
     @table.endUpdates
+  end
+
+  # == SHCTableViewCellDelegate ==
+  # Indicates that the edit process has begun for the given cell
+  def cellDidBeginEditing(editingCell)
+    index = Task.all.find_index { |t| t.text == editingCell.task.text}
+    index_path = NSIndexPath.indexPathForRow(index, inSection:0)
+
+    @table.scrollToRowAtIndexPath(index_path,
+      atScrollPosition: UITableViewScrollPositionTop, animated:true)
+
+    change_alpha_of_visible_cells do |cell|
+      cell.alpha = 0.3 unless cell == editingCell
+    end
+  end
+
+  # Indicates that the edit process has committed for the given cell
+  def cellDidEndEditing(editingCell)
+    change_alpha_of_visible_cells do |cell|
+      cell.alpha = 1
+    end
+  end
+
+  # == Helpers ==
+  def change_alpha_of_visible_cells
+    @table.visibleCells.each do |cell|
+      UIView.animateWithDuration(0.3, animations: lambda { yield cell })
+    end
   end
 end
